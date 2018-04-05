@@ -197,6 +197,7 @@ function! s:RunJob(options) abort
     let l:read_temporary_file = a:options.read_temporary_file
     let l:ChainWith = a:options.chain_with
     let l:read_buffer = a:options.read_buffer
+    let l:cwd = a:options.cwd
 
     if empty(l:command)
         " If there's nothing further to chain the command with, stop here.
@@ -250,6 +251,10 @@ function! s:RunJob(options) abort
         let l:job_options.err_cb = function('s:GatherOutput')
     else
         let l:job_options.out_cb = function('s:GatherOutput')
+    endif
+
+    if l:cwd isnot# ''
+        let l:job_options.cwd = l:cwd
     endif
 
     if get(g:, 'ale_emulate_job_failure') == 1
@@ -319,6 +324,10 @@ function! s:RunFixer(options) abort
             \   : call(l:Function, [l:buffer, copy(l:input)])
         endif
 
+        let l:cwd = has_key(a:options, 'cwd_callback')
+        \   ? ale#util#GetFunction(a:options.cwd_callback)
+        \   : ''
+
         if type(l:result) == type(0) && l:result == 0
             " When `0` is returned, skip this item.
             let l:index += 1
@@ -341,6 +350,7 @@ function! s:RunFixer(options) abort
             \   'callback_list': a:options.callback_list,
             \   'callback_index': l:index,
             \   'process_with': get(l:result, 'process_with', v:null),
+            \   'cwd': l:cwd,
             \})
 
             if !l:job_ran

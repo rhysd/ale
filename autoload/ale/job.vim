@@ -244,6 +244,10 @@ function! ale#job#Start(command, options) abort
             let l:job_options.on_exit = function('s:NeoVimCallback')
         endif
 
+        if has_key(a:options, 'cwd')
+            let l:job_options.cwd = a:options.cwd
+        endif
+
         let l:job_info.job = jobstart(a:command, l:job_options)
         let l:job_id = l:job_info.job
     else
@@ -267,6 +271,10 @@ function! ale#job#Start(command, options) abort
             " earlier on.
             let l:job_options.close_cb = function('s:VimCloseCallback')
             let l:job_options.exit_cb = function('s:VimExitCallback')
+        endif
+
+        if has_key(a:options, 'cwd')
+            let l:job_options.cwd = a:options.cwd
         endif
 
         " Vim 8 will read the stdin from the file's buffer.

@@ -503,6 +503,7 @@ function! s:RunJob(options) abort
     let l:next_chain_index = a:options.next_chain_index
     let l:read_buffer = a:options.read_buffer
     let l:info = g:ale_buffer_info[l:buffer]
+    let l:cwd = a:options.cwd
 
     if empty(l:command)
         return 0
@@ -539,6 +540,10 @@ function! s:RunJob(options) abort
         let l:job_options.err_cb = function('s:GatherOutput')
     else
         let l:job_options.out_cb = function('s:GatherOutput')
+    endif
+
+    if l:cwd isnot# ''
+        let l:job_options.cwd = l:cwd
     endif
 
     if get(g:, 'ale_run_synchronously') == 1
@@ -599,6 +604,7 @@ function! ale#engine#ProcessChain(buffer, linter, chain_index, input) abort
     let l:read_buffer = a:linter.read_buffer
     let l:chain_index = a:chain_index
     let l:input = a:input
+    let l:cwd = ale#linter#GetCurrentWorkingDir(a:buffer, a:linter)
 
     if has_key(a:linter, 'command_chain')
         while l:chain_index < len(a:linter.command_chain)
@@ -656,6 +662,7 @@ function! ale#engine#ProcessChain(buffer, linter, chain_index, input) abort
     \   'output_stream': l:output_stream,
     \   'next_chain_index': l:chain_index + 1,
     \   'read_buffer': l:read_buffer,
+    \   'cwd': l:cwd,
     \}
 endfunction
 

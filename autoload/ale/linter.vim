@@ -397,6 +397,13 @@ function! ale#linter#GetCommand(buffer, linter) abort
     \   : a:linter.command
 endfunction
 
+" Given a buffer and linter, get the current working directory String for the linter.
+function! ale#linter#GetCurrentWorkingDir(buffer, linter) abort
+    return has_key(a:linter, 'cwd_callback')
+    \   ? ale#util#GetFunction(a:linter.cwd_callback)(a:buffer)
+    \   : ''
+endfunction
+
 " Given a buffer and linter, get the address for connecting to the server.
 function! ale#linter#GetAddress(buffer, linter) abort
     return has_key(a:linter, 'address_callback')
